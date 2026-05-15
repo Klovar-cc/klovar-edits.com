@@ -77,7 +77,10 @@ body {
 }
 
 .cta {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
   padding: 0.85rem 1.6rem;
   font-size: 0.95rem;
   font-weight: 500;
@@ -100,32 +103,63 @@ body {
 }
 
 .email {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-size: 0.85rem;
   font-weight: 400;
   letter-spacing: 0.03em;
   color: var(--orange-deep);
   text-decoration: none;
   text-transform: lowercase;
+  transition: color 180ms ease;
+}
+
+.email span {
   border-bottom: 1px solid transparent;
-  transition: color 180ms ease, border-color 180ms ease;
+  transition: border-color 180ms ease;
 }
 
 .email:hover,
 .email:focus-visible {
   color: var(--orange);
-  border-bottom-color: var(--orange);
   outline: none;
+}
+
+.email:hover span,
+.email:focus-visible span {
+  border-bottom-color: var(--orange);
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.icon-croc {
+  width: auto;
+  height: 22px;
+  transition: transform 220ms ease;
+}
+
+.email:hover .icon-croc,
+.email:focus-visible .icon-croc {
+  transform: scale(1.08);
 }
 
 @media (max-width: 600px) {
   .hero { padding: 2rem 1rem; gap: 1.25rem; }
   .wordmark { width: 95vw; }
   .links { max-width: 320px; gap: 0.7rem; }
-  .cta { font-size: 0.9rem; padding: 0.75rem 1.3rem; }
+  .cta { font-size: 0.9rem; padding: 0.75rem 1.3rem; gap: 0.55rem; }
   .email { font-size: 0.8rem; }
+  .icon { width: 16px; height: 16px; }
+  .icon-croc { height: 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cta, .wordmark, .email { transition: none; }
+  .cta, .wordmark, .email, .icon-croc { transition: none; }
 }
