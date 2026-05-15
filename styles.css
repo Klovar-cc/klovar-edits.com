@@ -1,11 +1,8 @@
 :root {
   --bg: #0D0D10;
-  --bg-soft: #15151A;
   --orange: #FF4D00;
   --orange-deep: #CC3D00;
   --text: #F5F5F5;
-  --text-mute: #8A8A92;
-  --border: #2A2A2F;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,9 +22,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  position: relative;
 }
-
 
 .hero {
   flex: 1;
@@ -35,9 +30,21 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.5rem 2rem;
+  padding: 3rem 1.5rem;
   text-align: center;
-  gap: 1.25rem;
+  gap: 1.75rem;
+}
+
+.wordmark-link {
+  display: block;
+  line-height: 0;
+  outline: none;
+}
+
+.wordmark-link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 8px;
+  border-radius: 4px;
 }
 
 .wordmark {
@@ -46,36 +53,27 @@ body {
   display: block;
   user-select: none;
   -webkit-user-drag: none;
-  margin-bottom: 0.5rem;
   mix-blend-mode: screen;
+  transition: transform 220ms ease;
 }
 
-.tagline {
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--text);
-}
-
-.subtitle {
-  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-  font-weight: 300;
-  color: var(--text-mute);
-  max-width: 38ch;
+.wordmark-link:hover .wordmark,
+.wordmark-link:focus-visible .wordmark {
+  transform: scale(1.01);
 }
 
 .cta {
   display: inline-block;
-  margin-top: 1.5rem;
   padding: 0.85rem 1.6rem;
   font-size: 0.95rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   color: var(--orange);
   background: transparent;
   border: 1px solid var(--orange-deep);
   border-radius: 2px;
   text-decoration: none;
+  text-transform: lowercase;
   transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
@@ -87,20 +85,12 @@ body {
   outline: none;
 }
 
-.foot {
-  padding: 1.5rem;
-  text-align: center;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  color: var(--text-mute);
-  text-transform: lowercase;
-}
-
 @media (max-width: 600px) {
-  .hero { padding: 2.5rem 1rem 1.5rem; gap: 1rem; }
+  .hero { padding: 2rem 1rem; gap: 1.25rem; }
   .wordmark { width: 95vw; }
+  .cta { font-size: 0.9rem; padding: 0.75rem 1.3rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cta { transition: none; }
+  .cta, .wordmark { transition: none; }
 }
