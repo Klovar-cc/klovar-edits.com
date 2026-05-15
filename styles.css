@@ -62,6 +62,14 @@ body {
   transform: scale(1.01);
 }
 
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  max-width: 720px;
+}
+
 .cta {
   display: inline-block;
   padding: 0.85rem 1.6rem;
@@ -85,12 +93,34 @@ body {
   outline: none;
 }
 
+.email {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--orange-deep);
+  text-decoration: none;
+  text-transform: lowercase;
+  border-bottom: 1px solid transparent;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.email:hover,
+.email:focus-visible {
+  color: var(--orange);
+  border-bottom-color: var(--orange);
+  outline: none;
+}
+
 @media (max-width: 600px) {
   .hero { padding: 2rem 1rem; gap: 1.25rem; }
   .wordmark { width: 95vw; }
+  .links { flex-direction: column; width: 100%; max-width: 320px; gap: 0.6rem; }
   .cta { font-size: 0.9rem; padding: 0.75rem 1.3rem; }
+  .email { font-size: 0.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cta, .wordmark { transition: none; }
+  .cta, .wordmark, .email { transition: none; }
 }
