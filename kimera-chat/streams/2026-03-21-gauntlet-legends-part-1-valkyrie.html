@@ -32,7 +32,7 @@ a.au:hover { text-decoration:underline; filter:brightness(1.15); }
 .hidden { display:none !important; }
 #chat-target { background:rgba(242,201,76,.15); outline:2px solid #f2c94c; border-radius:3px; }
 .count { font-size:12px; color:#9aa0ac; }
-</style>
+</style><link rel="icon" type="image/png" href="../logo.png"><link rel="apple-touch-icon" href="../logo.png"><meta property="og:type" content="website"><meta property="og:title" content="Gauntlet: Legends | Part 1: Valkyrie 🌊"><meta property="og:image" content="../logo.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="../logo.png">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <style>
 .ar-top{position:sticky;top:0;z-index:120;display:flex;gap:7px;align-items:center;height:44px;
@@ -53,10 +53,45 @@ header{top:44px !important}
 .row{scroll-margin-top:122px}
 .row:target{background:rgba(242,201,76,.18)!important;outline:2px solid #f2c94c;border-radius:3px}
 @media(max-width:560px){.ar-date,.ar-plat{display:none}}
+
+#kegate{position:fixed;inset:0;z-index:99999;background:#0e0f13;display:flex;align-items:center;justify-content:center;padding:20px}
+#kegateF{background:#15171d;border:1px solid #2c313b;border-radius:14px;padding:28px 30px;display:flex;flex-direction:column;gap:12px;width:300px;max-width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#kegateF img{width:96px;height:96px;border-radius:14px;object-fit:cover;align-self:center;margin-bottom:2px}
+#kegateF .keg-t{font-size:18px;font-weight:700;color:#e6e8ec}
+#kegateF .keg-s{font-size:12px;color:#9aa0ac;margin-top:-4px}
+#kegateP{background:#0e0f13;border:1px solid #2c313b;color:#e6e8ec;padding:10px 12px;border-radius:8px;font-size:15px;text-align:center}
+#kegateP:focus{outline:none;border-color:#4b3a8f}
+#kegateF button{background:#2a2150;color:#c9b8ff;border:1px solid #4b3a8f;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+#kegateF button:hover{background:#372a6b;color:#fff}
+#kegateE{color:#ff7a82;font-size:12px;min-height:14px}
+
 </style>
 </head>
 <body>
 <div class="ar-top"><a class="ar-btn ar-home" href="../index.html" title="Back to the archive index">⌂ All</a><a class="ar-btn" data-nav="prev" href="2026-03-30-the-sims-2-pets-part-1-chad-returns-to-society.html" title="2026.03.30 · The Sims 2: Pets | Part 1: Chad Returns To Society 🌊">◀ Prev</a><a class="ar-btn" data-nav="next" href="2026-03-20-doom-the-lemon-challenge.html" title="2026.03.20 · DOOM | The Lemon Challenge 🌊">Next ▶</a><span class="ar-date">2026.03.21</span><span class="ar-plat ar-youtube">YouTube</span><span class="ar-title" title="Gauntlet: Legends | Part 1: Valkyrie 🌊">Gauntlet: Legends | Part 1: Valkyrie 🌊</span><a href="https://www.youtube.com/watch?v=u49RaXyx_3M" target="_blank" rel="noopener noreferrer" class="ar-open">Open VOD ↗</a></div>
+<div id="kegate"><form id="kegateF" autocomplete="off">
+  <img src="../logo.png" alt="">
+  <div class="keg-t">🔒 Private archive</div>
+  <div class="keg-s">Enter the password to continue.</div>
+  <input id="kegateP" type="password" placeholder="Password" autocomplete="off" autofocus>
+  <button type="submit">Enter</button>
+  <div id="kegateE"></div>
+</form></div>
+<script>
+(function(){
+  var PW="yippee", KEY='kea_unlocked', root=document.documentElement;
+  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';}
+  if(localStorage.getItem(KEY)==='1'){unlock();return;}
+  root.style.overflow='hidden';
+  var f=document.getElementById('kegateF');
+  if(f)f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(document.getElementById('kegateP').value===PW){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
+    else{document.getElementById('kegateE').textContent='Wrong password. Try again.';document.getElementById('kegateP').select();}
+  });
+})();
+</script>
+
 <header>
   <h1>Gauntlet: Legends | Part 1: Valkyrie 🌊 <span class="badge merged">merged timeline</span></h1>
   <div class="meta">Youtube 222  •  222 messages total</div>
