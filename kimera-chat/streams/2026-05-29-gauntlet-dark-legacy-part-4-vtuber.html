@@ -33,31 +33,30 @@ a.au:hover { text-decoration:underline; filter:brightness(1.15); }
 #chat-target { background:rgba(242,201,76,.15); outline:2px solid #f2c94c; border-radius:3px; }
 .count { font-size:12px; color:#9aa0ac; }
 </style>
+<meta name="robots" content="noindex, nofollow, noarchive">
 <style>
-.ar-nav{position:fixed;left:14px;bottom:14px;z-index:90;display:flex;gap:6px;
-  background:#15171d;border:1px solid #4b3a8f;border-radius:10px;padding:6px;
-  box-shadow:0 4px 16px rgba(0,0,0,.5)}
-.ar-btn{background:#2a2150;color:#c9b8ff;border:1px solid #4b3a8f;padding:7px 12px;
-  border-radius:7px;text-decoration:none;font:600 12px "Segoe UI",system-ui,sans-serif;
-  white-space:nowrap}
+.ar-top{position:sticky;top:0;z-index:120;display:flex;gap:7px;align-items:center;height:44px;
+  background:#11131a;border-bottom:1px solid #4b3a8f;padding:6px 10px;overflow:hidden}
+.ar-btn{background:#2a2150;color:#c9b8ff;border:1px solid #4b3a8f;padding:6px 10px;border-radius:7px;
+  text-decoration:none;font:600 12px "Segoe UI",system-ui,sans-serif;white-space:nowrap;flex:0 0 auto}
 .ar-btn:hover{background:#372a6b;color:#fff}
 .ar-btn.ar-home{background:#1d2333;border-color:#33405e;color:#9fb6e6}
 .ar-btn.ar-home:hover{background:#28324a;color:#fff}
 .ar-btn.ar-dis{opacity:.35;pointer-events:none}
-.ar-crumb{padding:7px 14px;background:#101218;border-bottom:1px solid #20242d;font-size:12px;
-  color:#9aa0ac;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ar-crumb .ar-sep{color:#3a3f4a}
-.ar-crumb .ar-title{color:#e6e8ec;font-weight:600}
-.ar-plat{font-weight:700}.ar-twitch{color:#a970ff}.ar-youtube{color:#ff4d4d}
-.ar-open{margin-left:auto;color:#7ab0ff;text-decoration:none}.ar-open:hover{text-decoration:underline}
-.list{padding-bottom:96px!important}
-.row{scroll-margin-top:120px}
+.ar-date{color:#6b7280;font-size:12px;flex:0 0 auto;margin-left:4px}
+.ar-plat{font-weight:700;font-size:12px;flex:0 0 auto}.ar-twitch{color:#a970ff}.ar-youtube{color:#ff4d4d}
+.ar-title{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:#e6e8ec;font-weight:600;font-size:13px}
+.ar-open{flex:0 0 auto;color:#7ab0ff;text-decoration:none;font-size:12px;white-space:nowrap}
+.ar-open:hover{text-decoration:underline}
+header{top:44px !important}
+.row{scroll-margin-top:122px}
 .row:target{background:rgba(242,201,76,.18)!important;outline:2px solid #f2c94c;border-radius:3px}
+@media(max-width:560px){.ar-date,.ar-plat{display:none}}
 </style>
 </head>
 <body>
-<div class="ar-nav"><a class="ar-btn ar-home" href="../index.html" title="Back to the archive index">⌂ All streams</a><a class="ar-btn" href="2026-05-29-hello-kitty-island-adventure-vtuber.html" title="2026.05.29 · Hello Kitty Island Adventure 🌱 Vtuber">◀ Prev</a><a class="ar-btn" href="2026-05-27-sly-2-part-2-vtuber.html" title="2026.05.27 · Sly 2: Part 2 ❄️ Vtuber">Next ▶</a></div>
-<div class="ar-crumb"><span class="ar-date">2026.05.29</span><span class="ar-sep">/</span><span class="ar-plat ar-youtube">YouTube</span><span class="ar-sep">/</span><span class="ar-title">Gauntlet Dark Legacy: Part 4 🌸 Vtuber</span><a href="https://www.youtube.com/watch?v=ZtzfM86H91w" target="_blank" rel="noopener noreferrer" class="ar-open">Open original VOD ↗</a></div>
+<div class="ar-top"><a class="ar-btn ar-home" href="../index.html" title="Back to the archive index">⌂ All</a><a class="ar-btn" data-nav="prev" href="2026-05-29-hello-kitty-island-adventure-vtuber.html" title="2026.05.29 · Hello Kitty Island Adventure 🌱 Vtuber">◀ Prev</a><a class="ar-btn" data-nav="next" href="2026-05-27-sly-2-part-2-vtuber.html" title="2026.05.27 · Sly 2: Part 2 ❄️ Vtuber">Next ▶</a><span class="ar-date">2026.05.29</span><span class="ar-plat ar-youtube">YouTube</span><span class="ar-title" title="Gauntlet Dark Legacy: Part 4 🌸 Vtuber">Gauntlet Dark Legacy: Part 4 🌸 Vtuber</span><a href="https://www.youtube.com/watch?v=ZtzfM86H91w" target="_blank" rel="noopener noreferrer" class="ar-open">Open VOD ↗</a></div>
 <header>
   <h1>Gauntlet Dark Legacy: Part 4 🌸 Vtuber <span class="badge merged">merged timeline</span></h1>
   <div class="meta">Youtube 700  •  700 messages total</div>
@@ -800,6 +799,21 @@ a.au:hover { text-decoration:underline; filter:brightness(1.15); }
         target.style.background=''; target.style.outline=''; }, 4000);
     }, 150);
   }
+})();
+</script>
+
+<script>
+(function(){
+  // ◀ / ▶ jump to the previous / next stream (ignored while typing in a field).
+  document.addEventListener('keydown',function(e){
+    var t=e.target||{},tag=(t.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||t.isContentEditable)return;
+    if(e.altKey||e.ctrlKey||e.metaKey)return;
+    var sel=e.key==='ArrowLeft'?'[data-nav=prev]':e.key==='ArrowRight'?'[data-nav=next]':null;
+    if(!sel)return;
+    var a=document.querySelector('.ar-top a'+sel);
+    if(a){e.preventDefault();location.href=a.getAttribute('href');}
+  });
 })();
 </script>
 </body></html>
