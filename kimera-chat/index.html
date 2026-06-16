@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Kimera Chimera — Chat Archive</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#0e0f13;color:#e6e8ec;font:14px/1.55 "Segoe UI",system-ui,sans-serif}
+a{color:#bf94ff;text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:5;background:#15171d;border-bottom:1px solid #262a33;padding:14px 18px}
+h1{margin:0;font-size:19px}
+.sub{color:#9aa0ac;font-size:12px;margin-top:3px}
+.wrap{max-width:980px;margin:0 auto;padding:18px}
+.cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.card{flex:1 1 130px;background:#15171d;border:1px solid #262a33;border-radius:10px;padding:12px 14px}
+.card .n{font-size:22px;font-weight:700}
+.card .l{font-size:11px;color:#9aa0ac;text-transform:uppercase;letter-spacing:.04em}
+.tw{color:#a970ff}.yt{color:#ff4d4d}
+#q{width:100%;background:#0e0f13;border:1px solid #2c313b;color:#e6e8ec;padding:11px 14px;border-radius:9px;font-size:15px}
+.hint{color:#6b7280;font-size:12px;margin:6px 2px 0}
+.section{margin-top:22px}
+.section h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#9aa0ac;margin:0 0 10px;border-bottom:1px solid #20242d;padding-bottom:6px}
+.fbar{display:flex;gap:8px;margin:12px 0 2px;align-items:center;flex-wrap:wrap}
+.fbar .fl{color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
+.fbtn{background:#15171d;border:1px solid #2c313b;color:#cfd3da;border-radius:8px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600}
+.fbtn.tw{color:#b98cff}.fbtn.yt{color:#ff7a82}
+.fbtn:hover{border-color:#4b3a8f;filter:brightness(1.15)}
+.fbtn.on{background:#2a2150;border-color:#4b3a8f;color:#fff}
+.fbtn.on.tw{background:#241a45;border-color:#6c3df0;color:#d6c4ff}
+.fbtn.on.yt{background:#3a1f24;border-color:#e0444f;color:#ffc9cd}
+.results{margin-top:10px}
+.res{padding:7px 10px;border-bottom:1px solid #16181f;display:flex;gap:9px;align-items:baseline}
+.res:hover{background:#16181f}
+.res .rt{color:#7ab0ff;font-size:11px;min-width:54px;flex:0 0 auto;font-variant-numeric:tabular-nums;text-decoration:none}
+.res .rt:hover{text-decoration:underline}
+.res .rt.dead{color:#5d6470;pointer-events:none}
+.res .rbody{flex:1;min-width:0}
+.res .ra{font-weight:600;color:#e6e8ec;cursor:pointer}
+.res .ra:hover{text-decoration:underline;color:#fff}
+.res .ra::after{content:":";color:#5d6470;font-weight:400;cursor:default}
+.res .rm{color:#cfd3da;text-decoration:none}
+.res .rm:hover{color:#fff;text-decoration:underline}
+.res .rs{display:block;color:#6b7280;font-size:11px;margin-top:1px}
+.chatters{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#15171d;border:1px solid #2c313b;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer;color:#cfd3da}
+.chip:hover{border-color:#4b3a8f;color:#fff}.chip b{color:#9aa0ac;font-weight:600;margin-left:5px}
+.cb{display:inline-block;font-size:9px;font-weight:700;padding:1px 4px;border-radius:5px;border:1px solid;margin-right:4px;vertical-align:1px}
+.cb.tw{color:#a970ff;border-color:#3a2d63}.cb.yt{color:#ff4d4d;border-color:#5a2730}
+.month{margin-bottom:6px}
+.month>summary{cursor:pointer;padding:7px 10px;background:#15171d;border:1px solid #262a33;border-radius:8px;font-weight:600;list-style:none}
+.month>summary::-webkit-details-marker{display:none}
+.month>summary:hover{border-color:#3a4150}
+.stream{display:flex;gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid #16181f}
+.stream:hover{background:#16181f}
+.stream .sd{color:#5d6470;font-size:12px;min-width:78px;flex:0 0 auto}
+.stream .sp{font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;border:1px solid;flex:0 0 auto}
+.sp.twitch{color:#a970ff;border-color:#3a2d63}.sp.youtube{color:#ff4d4d;border-color:#5a2730}
+.stream .st{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stream .sc{color:#6b7280;font-size:12px;flex:0 0 auto}
+.muted{color:#6b7280;font-size:12px;padding:10px 2px}
+</style></head>
+<body>
+<header>
+  <h1>Kimera Chimera <span style="color:#6b7280;font-weight:400">· Chat Archive</span></h1>
+  <div class="sub" id="subline"></div>
+</header>
+<div class="wrap">
+  <div class="cards" id="cards"></div>
+  <input id="q" type="search" placeholder="Search every chat — usernames, phrases, words…" autofocus>
+  <div class="fbar">
+    <span class="fl">Platform</span>
+    <button class="fbtn on" data-p="all" id="f-all">All</button>
+    <button class="fbtn tw" data-p="twitch" id="f-tw">Twitch</button>
+    <button class="fbtn yt" data-p="youtube" id="f-yt">YouTube</button>
+  </div>
+  <div class="hint">Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. Click a <b style="color:#fff">name</b> to see everything that person said. (Inside a stream, your browser's Ctrl+F also works.)</div>
+  <div class="section" id="resultsWrap" style="display:none">
+    <h2>Search results <span id="rcount" style="color:#6b7280;font-weight:400"></span></h2>
+    <div class="results" id="results"></div>
+  </div>
+  <div class="section">
+    <h2>Top chatters</h2>
+    <div class="chatters" id="chatters"></div>
+  </div>
+  <div class="section">
+    <h2>Streams</h2>
+    <div id="streams"></div>
+  </div>
+</div>
+<script src="archive-data.js"></script>
+<script>
+(function(){
+  var A=window.ARCHIVE||{streams:[],msgs:[],totals:{}};
+  var S=A.streams, M=A.msgs, T=A.totals||{};
+  var plat='all';   // 'all' | 'twitch' | 'youtube'
+  function hms(s){s=Math.max(0,s|0);var h=(s/3600)|0,m=((s%3600)/60)|0,x=s%60;return h+':'+(m<10?'0':'')+m+':'+(x<10?'0':'')+x;}
+  // Deep-link straight to the original VOD at this exact second (YouTube/Twitch).
+  function deep(s,off){if(!s||!s.url)return '';var t=Math.max(0,off|0);return s.url+(s.url.indexOf('?')>=0?'&':'?')+'t='+t+'s';}
+  function esc(t){return (t==null?'':String(t)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function pOf(m){var s=S[m[0]];return s?s.platform:'';}        // a message's platform = its stream's
+  function inPlat(m){return plat==='all'||pOf(m)===plat;}
+
+  document.getElementById('subline').textContent =
+    (T.streams||0)+' streams  •  '+(T.messages||0).toLocaleString()+' messages  •  '
+    +(A.range&&A.range.first?A.range.first+' → '+A.range.last:'')+'  •  generated '+(A.generated||'');
+  document.getElementById('cards').innerHTML =
+    '<div class="card"><div class="n">'+(T.messages||0).toLocaleString()+'</div><div class="l">Messages</div></div>'
+   +'<div class="card"><div class="n">'+(T.streams||0)+'</div><div class="l">Streams</div></div>'
+   +'<div class="card"><div class="n tw">'+(T.twitch||0).toLocaleString()+'</div><div class="l">Twitch</div></div>'
+   +'<div class="card"><div class="n yt">'+(T.youtube||0).toLocaleString()+'</div><div class="l">YouTube</div></div>';
+
+  // ── Top chatters (respects platform filter, shows TW/YT badges) ──
+  var chBox=document.getElementById('chatters');
+  function renderChatters(){
+    var counts={}, plats={};
+    for(var i=0;i<M.length;i++){
+      var m=M[i]; if(!inPlat(m))continue;
+      var a=m[3]; if(!a)continue;
+      counts[a]=(counts[a]||0)+1;
+      (plats[a]=plats[a]||{})[pOf(m)]=1;
+    }
+    var top=Object.keys(counts).map(function(k){return [k,counts[k]];})
+              .sort(function(a,b){return b[1]-a[1];}).slice(0,30);
+    chBox.innerHTML = top.map(function(c){
+      var p=plats[c[0]]||{};
+      var b=(p.twitch?'<span class="cb tw">TW</span>':'')+(p.youtube?'<span class="cb yt">YT</span>':'');
+      return '<span class="chip" data-u="'+esc(c[0])+'" title="Search everything '+esc(c[0])+' said">'+b+esc(c[0])+'<b>'+c[1].toLocaleString()+'</b></span>';
+    }).join('') || '<div class="muted">No chatters for this platform.</div>';
+  }
+  chBox.addEventListener('click',function(e){
+    var c=e.target.closest('.chip'); if(!c)return; searchFor(c.dataset.u);
+  });
+
+  // ── Stream directory grouped by month — DEFAULT COLLAPSED, respects filter ──
+  var stBox=document.getElementById('streams');
+  function renderStreams(){
+    var byMonth={};
+    S.forEach(function(s){
+      if(plat!=='all'&&s.platform!==plat)return;
+      var mo=(s.date||'').slice(0,7)||'undated';(byMonth[mo]=byMonth[mo]||[]).push(s);
+    });
+    var months=Object.keys(byMonth).sort().reverse();
+    stBox.innerHTML = months.map(function(mo){
+      var rows=byMonth[mo].map(function(s){
+        return '<a class="stream" href="streams/'+encodeURIComponent(s.slug)+'.html">'
+          +'<span class="sd">'+esc(s.date)+'</span>'
+          +'<span class="sp '+s.platform+'">'+(s.platform==='twitch'?'TW':'YT')+'</span>'
+          +'<span class="st">'+esc(s.title)+'</span>'
+          +'<span class="sc">'+s.count.toLocaleString()+'</span></a>';
+      }).join('');
+      return '<details class="month"><summary>'+esc(mo)+' · '+byMonth[mo].length+' streams</summary>'+rows+'</details>';
+    }).join('') || '<div class="muted">No streams for this platform.</div>';
+  }
+
+  // ── Global search — name→search, message & timestamp→public VOD moment ──
+  var qbox=document.getElementById('q'), rwrap=document.getElementById('resultsWrap'),
+      rbox=document.getElementById('results'), rcount=document.getElementById('rcount'), tmr=null;
+  var CAP=400;
+  function runSearch(){
+    var q=qbox.value.trim().toLowerCase();
+    if(q.length<2){rwrap.style.display='none';rbox.innerHTML='';return;}
+    var hits=[],n=0;
+    for(var i=0;i<M.length;i++){
+      var m=M[i]; if(!inPlat(m))continue;
+      if((m[3]&&m[3].toLowerCase().indexOf(q)!==-1)||(m[4]&&m[4].toLowerCase().indexOf(q)!==-1)){
+        n++; if(hits.length<CAP) hits.push(m);
+      }
+    }
+    rwrap.style.display='block';
+    rcount.textContent='('+n.toLocaleString()+(n>CAP?', showing first '+CAP:'')+')';
+    rbox.innerHTML = hits.map(function(m){
+      var s=S[m[0]]||{};
+      var vod=deep(s,m[2]);
+      var pl=(s.platform==='twitch'?'Twitch':'YouTube');
+      var ts=vod
+        ? '<a class="rt" href="'+esc(vod)+'" target="_blank" rel="noopener noreferrer" title="Open the '+pl+' VOD at this moment">'+hms(m[2])+'</a>'
+        : '<span class="rt dead" title="No source VOD link">'+hms(m[2])+'</span>';
+      var msg=vod
+        ? '<a class="rm" href="'+esc(vod)+'" target="_blank" rel="noopener noreferrer" title="Open the '+pl+' VOD at this moment">'+esc(m[4])+'</a>'
+        : '<span class="rm">'+esc(m[4])+'</span>';
+      return '<div class="res">'+ts
+        +'<div class="rbody">'
+        +'<span class="ra" data-u="'+esc(m[3])+'" title="Search everything '+esc(m[3])+' said">'+esc(m[3])+'</span>'
+        +msg
+        +'<span class="rs">'+esc(s.date)+' · '+esc(s.title)+'</span></div></div>';
+    }).join('') || '<div class="muted">No matches.</div>';
+  }
+  rbox.addEventListener('click',function(e){
+    var a=e.target.closest('.ra'); if(!a)return; searchFor(a.dataset.u);
+  });
+  function searchFor(name){
+    qbox.value=name; plat='all'; syncFilterButtons();
+    renderChatters(); renderStreams(); runSearch();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  qbox.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(runSearch,160);});
+  window.runSearch=runSearch;
+
+  // ── Platform filter buttons (All / Twitch / YouTube) ──
+  var fbtns=[document.getElementById('f-all'),document.getElementById('f-tw'),document.getElementById('f-yt')];
+  function syncFilterButtons(){fbtns.forEach(function(b){if(b)b.classList.toggle('on',b.dataset.p===plat);});}
+  fbtns.forEach(function(b){if(!b)return;b.addEventListener('click',function(){
+    plat=b.dataset.p; syncFilterButtons(); renderChatters(); renderStreams(); runSearch();
+  });});
+
+  renderChatters(); renderStreams(); syncFilterButtons();
+})();
+</script>
+</body></html>
