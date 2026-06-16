@@ -60,14 +60,36 @@ h1{margin:0;font-size:19px}
 .stream .st{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stream .sc{color:#6b7280;font-size:12px;flex:0 0 auto}
 .muted{color:#6b7280;font-size:12px;padding:10px 2px}
+.topnav{margin-top:9px;display:flex;gap:16px;flex-wrap:wrap}
+.topnav a{color:#9aa0ac;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.topnav a:hover{color:#fff;text-decoration:none}
+.section{scroll-margin-top:104px}
+#searchSec{scroll-margin-top:104px}
+.h2c{color:#6b7280;font-weight:400}
+.section h2.h2row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.h2row .stools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.stools #sfilter{background:#0e0f13;border:1px solid #2c313b;color:#e6e8ec;padding:4px 11px;border-radius:7px;font-size:12px;width:210px}
+.stools #sfilter:focus{outline:none;border-color:#4b3a8f}
+.totop{position:fixed;right:16px;bottom:16px;z-index:50;width:42px;height:42px;border-radius:50%;
+  background:#2a2150;color:#c9b8ff;border:1px solid #4b3a8f;font-size:18px;cursor:pointer;display:none;
+  box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.totop:hover{background:#372a6b;color:#fff}
+.totop.show{display:block}
+@media(max-width:560px){.h2row .stools{margin-left:0;width:100%}.stools #sfilter{flex:1;width:auto}}
 </style></head>
 <body>
 <header>
   <h1>Kimera Chimera <span style="color:#6b7280;font-weight:400">· Chat Archive</span></h1>
   <div class="sub" id="subline"></div>
+  <nav class="topnav">
+    <a href="#searchSec">Search</a>
+    <a href="#chattersSec">Top chatters</a>
+    <a href="#streamsSec">Streams</a>
+  </nav>
 </header>
 <div class="wrap">
   <div class="cards" id="cards"></div>
+  <div id="searchSec"></div>
   <input id="q" type="search" placeholder="Search every chat — usernames, phrases, words…" autofocus>
   <div class="fbar">
     <span class="fl">Platform</span>
@@ -75,20 +97,26 @@ h1{margin:0;font-size:19px}
     <button class="fbtn tw" data-p="twitch" id="f-tw">Twitch</button>
     <button class="fbtn yt" data-p="youtube" id="f-yt">YouTube</button>
   </div>
-  <div class="hint">Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. Click a <b style="color:#fff">name</b> to see everything that person said. (Inside a stream, your browser's Ctrl+F also works.)</div>
+  <div class="hint">Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. Click a <b style="color:#fff">name</b> to see everything that person said. (Inside a stream, your browser's Ctrl+F also works, and ◀ ▶ jump between streams.)</div>
   <div class="section" id="resultsWrap" style="display:none">
     <h2>Search results <span id="rcount" style="color:#6b7280;font-weight:400"></span></h2>
     <div class="results" id="results"></div>
   </div>
-  <div class="section">
+  <div class="section" id="chattersSec">
     <h2>Top chatters</h2>
     <div class="chatters" id="chatters"></div>
   </div>
-  <div class="section">
-    <h2>Streams</h2>
+  <div class="section" id="streamsSec">
+    <h2 class="h2row">Streams <span id="scount" class="h2c"></span>
+      <span class="stools">
+        <input id="sfilter" type="search" placeholder="Filter by game or title…">
+        <button id="sexpand" class="fbtn" data-open="0">Expand all</button>
+      </span>
+    </h2>
     <div id="streams"></div>
   </div>
 </div>
+<button id="toTop" class="totop" title="Back to top" aria-label="Back to top">↑</button>
 <script src="archive-data.js"></script>
 <script>
 (function(){
@@ -133,15 +161,20 @@ h1{margin:0;font-size:19px}
     var c=e.target.closest('.chip'); if(!c)return; searchFor(c.dataset.u);
   });
 
-  // ── Stream directory grouped by month — DEFAULT COLLAPSED, respects filter ──
-  var stBox=document.getElementById('streams');
+  // ── Stream directory grouped by month — collapsed by default, filterable ──
+  var stBox=document.getElementById('streams'), scount=document.getElementById('scount'),
+      sfilter=document.getElementById('sfilter'), sexpand=document.getElementById('sexpand');
   function renderStreams(){
-    var byMonth={};
+    var f=(sfilter&&sfilter.value.trim().toLowerCase())||'';
+    var byMonth={}, total=0;
     S.forEach(function(s){
       if(plat!=='all'&&s.platform!==plat)return;
-      var mo=(s.date||'').slice(0,7)||'undated';(byMonth[mo]=byMonth[mo]||[]).push(s);
+      if(f&&(s.title||'').toLowerCase().indexOf(f)===-1&&(s.date||'').indexOf(f)===-1)return;
+      var mo=(s.date||'').slice(0,7)||'undated';(byMonth[mo]=byMonth[mo]||[]).push(s);total++;
     });
     var months=Object.keys(byMonth).sort().reverse();
+    // Filtering (or an explicit Expand all) opens the months so matches are visible.
+    var openAll=!!f||(sexpand&&sexpand.dataset.open==='1');
     stBox.innerHTML = months.map(function(mo){
       var rows=byMonth[mo].map(function(s){
         return '<a class="stream" href="streams/'+encodeURIComponent(s.slug)+'.html">'
@@ -150,9 +183,17 @@ h1{margin:0;font-size:19px}
           +'<span class="st">'+esc(s.title)+'</span>'
           +'<span class="sc">'+s.count.toLocaleString()+'</span></a>';
       }).join('');
-      return '<details class="month"><summary>'+esc(mo)+' · '+byMonth[mo].length+' streams</summary>'+rows+'</details>';
-    }).join('') || '<div class="muted">No streams for this platform.</div>';
+      return '<details class="month"'+(openAll?' open':'')+'><summary>'+esc(mo)+' · '+byMonth[mo].length+' streams</summary>'+rows+'</details>';
+    }).join('') || '<div class="muted">No streams match.</div>';
+    if(scount)scount.textContent='('+total+(f||(plat!=='all')?' of '+S.length:'')+')';
   }
+  if(sfilter)sfilter.addEventListener('input',renderStreams);
+  if(sexpand)sexpand.addEventListener('click',function(){
+    var open=sexpand.dataset.open!=='1';
+    sexpand.dataset.open=open?'1':'0';
+    sexpand.textContent=open?'Collapse all':'Expand all';
+    stBox.querySelectorAll('details.month').forEach(function(d){d.open=open;});
+  });
 
   // ── Global search — name→search, message & timestamp→public VOD moment ──
   var qbox=document.getElementById('q'), rwrap=document.getElementById('resultsWrap'),
@@ -204,6 +245,13 @@ h1{margin:0;font-size:19px}
   fbtns.forEach(function(b){if(!b)return;b.addEventListener('click',function(){
     plat=b.dataset.p; syncFilterButtons(); renderChatters(); renderStreams(); runSearch();
   });});
+
+  // ── Back-to-top floating button ──
+  var toTop=document.getElementById('toTop');
+  if(toTop){
+    window.addEventListener('scroll',function(){toTop.classList.toggle('show',window.scrollY>500);});
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  }
 
   renderChatters(); renderStreams(); syncFilterButtons();
 })();
