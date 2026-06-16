@@ -87,14 +87,16 @@ header{top:44px !important}
 </form></div>
 <script>
 (function(){
-  var PW="yippee", KEY='kea_unlocked', root=document.documentElement;
-  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';}
+  var PWS=["yippee"], KEY="kea_02c2be4bcb", root=document.documentElement;
+  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';try{if(location.hash){var el=document.querySelector(location.hash);if(el)el.scrollIntoView({block:'center'});}}catch(_){ }}
+  // A new KEY (after a password/nonce change) wipes any older saved unlocks.
+  try{for(var i=localStorage.length-1;i>=0;i--){var k=localStorage.key(i);if(k&&k.indexOf('kea_')===0&&k!==KEY)localStorage.removeItem(k);}}catch(_){ }
   if(localStorage.getItem(KEY)==='1'){unlock();return;}
   root.style.overflow='hidden';
   var f=document.getElementById('kegateF');
   if(f)f.addEventListener('submit',function(e){
     e.preventDefault();
-    if(document.getElementById('kegateP').value===PW){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
+    if(PWS.indexOf(document.getElementById('kegateP').value)!==-1){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
     else{document.getElementById('kegateE').textContent='Wrong password. Try again.';document.getElementById('kegateP').select();}
   });
 })();

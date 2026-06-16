@@ -107,14 +107,16 @@ h1{margin:0;font-size:19px}
 </form></div>
 <script>
 (function(){
-  var PW="yippee", KEY='kea_unlocked', root=document.documentElement;
-  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';}
+  var PWS=["yippee"], KEY="kea_02c2be4bcb", root=document.documentElement;
+  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';try{if(location.hash){var el=document.querySelector(location.hash);if(el)el.scrollIntoView({block:'center'});}}catch(_){ }}
+  // A new KEY (after a password/nonce change) wipes any older saved unlocks.
+  try{for(var i=localStorage.length-1;i>=0;i--){var k=localStorage.key(i);if(k&&k.indexOf('kea_')===0&&k!==KEY)localStorage.removeItem(k);}}catch(_){ }
   if(localStorage.getItem(KEY)==='1'){unlock();return;}
   root.style.overflow='hidden';
   var f=document.getElementById('kegateF');
   if(f)f.addEventListener('submit',function(e){
     e.preventDefault();
-    if(document.getElementById('kegateP').value===PW){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
+    if(PWS.indexOf(document.getElementById('kegateP').value)!==-1){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
     else{document.getElementById('kegateE').textContent='Wrong password. Try again.';document.getElementById('kegateP').select();}
   });
 })();
@@ -140,7 +142,7 @@ h1{margin:0;font-size:19px}
     <button class="fbtn tw" data-p="twitch" id="f-tw">Twitch</button>
     <button class="fbtn yt" data-p="youtube" id="f-yt">YouTube</button>
   </div>
-  <div class="hint">Click a <b style="color:#fff">name</b> to lock onto that person — then type to search only <b style="color:#fff">their</b> phrases (✕ clears it). Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. (Inside a stream, Ctrl+F works, and ◀ ▶ jump between streams.)</div>
+  <div class="hint">Click a <b style="color:#fff">name</b> to lock onto that person — then type to search only <b style="color:#fff">their</b> phrases (✕ clears it). Click a <b style="color:#cfd3da">message</b> to read it in the archived chat with the surrounding conversation; click a <b style="color:#7ab0ff">timestamp</b> to open the original VOD at that moment. (Inside a stream, Ctrl+F works, and ◀ ▶ jump between streams.)</div>
   <div class="section" id="resultsWrap" style="display:none">
     <h2>Search results <span id="rcount" style="color:#6b7280;font-weight:400"></span></h2>
     <div class="results" id="results"></div>
@@ -275,8 +277,9 @@ h1{margin:0;font-size:19px}
       var ts=vod
         ? '<a class="rt" href="'+esc(vod)+'" target="_blank" rel="noopener noreferrer" title="Open the '+pl+' VOD at this moment">'+hms(m[2])+'</a>'
         : '<span class="rt dead" title="No source VOD link">'+hms(m[2])+'</span>';
-      var msg=vod
-        ? '<a class="rm" href="'+esc(vod)+'" target="_blank" rel="noopener noreferrer" title="Open the '+pl+' VOD at this moment">'+esc(m[4])+'</a>'
+      var ctx = s.slug ? ('streams/'+encodeURIComponent(s.slug)+'.html#m'+m[1]) : '';
+      var msg = ctx
+        ? '<a class="rm" href="'+esc(ctx)+'" title="Read this moment in the archived chat, with the surrounding conversation">'+esc(m[4])+'</a>'
         : '<span class="rm">'+esc(m[4])+'</span>';
       return '<div class="res">'+ts
         +'<div class="rbody">'
