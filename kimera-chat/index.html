@@ -76,6 +76,11 @@ h1{margin:0;font-size:19px}
   box-shadow:0 4px 16px rgba(0,0,0,.5)}
 .totop:hover{background:#372a6b;color:#fff}
 .totop.show{display:block}
+.lockbar{margin:9px 0 0;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.lockpill{display:inline-flex;align-items:center;gap:8px;background:#241a45;border:1px solid #6c3df0;color:#d6c4ff;border-radius:15px;padding:4px 7px 4px 12px;font-size:12px;font-weight:700}
+.lockpill .lx{cursor:pointer;background:#3a2d63;color:#e9deff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1}
+.lockpill .lx:hover{background:#6c3df0;color:#fff}
+.lockbar .lc{color:#8a7fb0;font-size:12px;font-weight:600}
 @media(max-width:560px){.h2row .stools{margin-left:0;width:100%}.stools #sfilter{flex:1;width:auto}}
 
 #kegate{position:fixed;inset:0;z-index:99999;background:#0e0f13;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -128,13 +133,14 @@ h1{margin:0;font-size:19px}
   <div class="cards" id="cards"></div>
   <div id="searchSec"></div>
   <input id="q" type="search" placeholder="Search every chat — usernames, phrases, words…" autofocus>
+  <div id="lockbar" class="lockbar" style="display:none"></div>
   <div class="fbar">
     <span class="fl">Platform</span>
     <button class="fbtn on" data-p="all" id="f-all">All</button>
     <button class="fbtn tw" data-p="twitch" id="f-tw">Twitch</button>
     <button class="fbtn yt" data-p="youtube" id="f-yt">YouTube</button>
   </div>
-  <div class="hint">Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. Click a <b style="color:#fff">name</b> to see everything that person said. (Inside a stream, your browser's Ctrl+F also works, and ◀ ▶ jump between streams.)</div>
+  <div class="hint">Click a <b style="color:#fff">name</b> to lock onto that person — then type to search only <b style="color:#fff">their</b> phrases (✕ clears it). Click a <b style="color:#7ab0ff">timestamp</b> or a <b style="color:#cfd3da">message</b> to open the original VOD at that exact moment. (Inside a stream, Ctrl+F works, and ◀ ▶ jump between streams.)</div>
   <div class="section" id="resultsWrap" style="display:none">
     <h2>Search results <span id="rcount" style="color:#6b7280;font-weight:400"></span></h2>
     <div class="results" id="results"></div>
@@ -205,7 +211,7 @@ h1{margin:0;font-size:19px}
     }).join('') || '<div class="muted">No chatters for this platform.</div>';
   }
   chBox.addEventListener('click',function(e){
-    var c=e.target.closest('.chip'); if(!c)return; searchFor(c.dataset.k, c.dataset.d);
+    var c=e.target.closest('.chip'); if(!c)return; lockPerson(c.dataset.k, c.dataset.d);
   });
 
   // ── Stream directory grouped by month — collapsed by default, filterable ──
@@ -244,20 +250,24 @@ h1{margin:0;font-size:19px}
 
   // ── Global search — name→search, message & timestamp→public VOD moment ──
   var qbox=document.getElementById('q'), rwrap=document.getElementById('resultsWrap'),
-      rbox=document.getElementById('results'), rcount=document.getElementById('rcount'), tmr=null;
-  var CAP=400, authorKey=null;   // when set, search matches an exact (merged) chatter
+      rbox=document.getElementById('results'), rcount=document.getElementById('rcount'),
+      lockbar=document.getElementById('lockbar'), tmr=null;
+  var CAP=400, DEFAULT_PH=qbox.getAttribute('placeholder');
+  var lockKey=null, lockDisp='';   // pinned chatter: search only within their messages
   function runSearch(){
     var q=qbox.value.trim().toLowerCase();
-    if(!authorKey && q.length<2){rwrap.style.display='none';rbox.innerHTML='';return;}
+    if(!lockKey && q.length<2){rwrap.style.display='none';rbox.innerHTML='';return;}
     var hits=[],n=0;
     for(var i=0;i<M.length;i++){
       var m=M[i]; if(!inPlat(m))continue;
-      var ok = authorKey ? (NA[i]===authorKey)
-        : ((m[3]&&m[3].toLowerCase().indexOf(q)!==-1)||(m[4]&&m[4].toLowerCase().indexOf(q)!==-1));
+      var ok;
+      if(lockKey){ if(NA[i]!==lockKey)continue; ok = !q || (m[4]&&m[4].toLowerCase().indexOf(q)!==-1); }
+      else ok = (m[3]&&m[3].toLowerCase().indexOf(q)!==-1)||(m[4]&&m[4].toLowerCase().indexOf(q)!==-1);
       if(ok){ n++; if(hits.length<CAP) hits.push(m); }
     }
     rwrap.style.display='block';
-    rcount.textContent='('+n.toLocaleString()+(n>CAP?', showing first '+CAP:'')+')';
+    rcount.textContent='('+n.toLocaleString()+(n>CAP?', showing first '+CAP:'')
+      +(lockKey?(q?' phrase matches':' messages')+' from '+lockDisp:'')+')';
     rbox.innerHTML = hits.map(function(m){
       var s=S[m[0]]||{};
       var vod=deep(s,m[2]);
@@ -276,14 +286,29 @@ h1{margin:0;font-size:19px}
     }).join('') || '<div class="muted">No matches.</div>';
   }
   rbox.addEventListener('click',function(e){
-    var a=e.target.closest('.ra'); if(!a)return; searchFor(a.dataset.k, a.dataset.d);
+    var a=e.target.closest('.ra'); if(!a)return; lockPerson(a.dataset.k, a.dataset.d);
   });
-  function searchFor(key, disp){
-    authorKey=key||null; qbox.value=disp||''; plat='all'; syncFilterButtons();
-    renderChatters(); renderStreams(); runSearch();
-    window.scrollTo({top:0,behavior:'smooth'});
+  function renderLock(){
+    if(!lockbar)return;
+    if(lockKey){
+      lockbar.style.display='flex';
+      lockbar.innerHTML='<span class="lockpill">👤 '+esc(lockDisp)
+        +' <span class="lx" title="Clear — search everyone again">✕</span></span>'
+        +'<span class="lc">searching only this person — type to find their phrases</span>';
+    }else{ lockbar.style.display='none'; lockbar.innerHTML=''; }
   }
-  qbox.addEventListener('input',function(){authorKey=null;clearTimeout(tmr);tmr=setTimeout(runSearch,160);});
+  function lockPerson(key, disp){
+    lockKey=key||null; lockDisp=disp||''; qbox.value=''; plat='all'; syncFilterButtons();
+    qbox.placeholder = lockKey ? ('Search phrases from '+lockDisp+'…') : DEFAULT_PH;
+    renderLock(); renderChatters(); renderStreams(); runSearch();
+    qbox.focus(); window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function clearLock(){
+    lockKey=null; lockDisp=''; qbox.value=''; qbox.placeholder=DEFAULT_PH;
+    renderLock(); runSearch(); qbox.focus();
+  }
+  if(lockbar)lockbar.addEventListener('click',function(e){if(e.target.closest('.lx'))clearLock();});
+  qbox.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(runSearch,160);});
   window.runSearch=runSearch;
 
   // ── Platform filter buttons (All / Twitch / YouTube) ──
