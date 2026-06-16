@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" type="image/png" href="logo.png"><link rel="apple-touch-icon" href="logo.png"><meta property="og:type" content="website"><meta property="og:title" content="Kimera Chimera — Chat Archive"><meta property="og:image" content="logo.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="logo.png">
 <title>Kimera Chimera — Chat Archive</title>
 <style>
 :root{color-scheme:dark}
@@ -76,8 +77,44 @@ h1{margin:0;font-size:19px}
 .totop:hover{background:#372a6b;color:#fff}
 .totop.show{display:block}
 @media(max-width:560px){.h2row .stools{margin-left:0;width:100%}.stools #sfilter{flex:1;width:auto}}
+
+#kegate{position:fixed;inset:0;z-index:99999;background:#0e0f13;display:flex;align-items:center;justify-content:center;padding:20px}
+#kegateF{background:#15171d;border:1px solid #2c313b;border-radius:14px;padding:28px 30px;display:flex;flex-direction:column;gap:12px;width:300px;max-width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#kegateF img{width:96px;height:96px;border-radius:14px;object-fit:cover;align-self:center;margin-bottom:2px}
+#kegateF .keg-t{font-size:18px;font-weight:700;color:#e6e8ec}
+#kegateF .keg-s{font-size:12px;color:#9aa0ac;margin-top:-4px}
+#kegateP{background:#0e0f13;border:1px solid #2c313b;color:#e6e8ec;padding:10px 12px;border-radius:8px;font-size:15px;text-align:center}
+#kegateP:focus{outline:none;border-color:#4b3a8f}
+#kegateF button{background:#2a2150;color:#c9b8ff;border:1px solid #4b3a8f;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+#kegateF button:hover{background:#372a6b;color:#fff}
+#kegateE{color:#ff7a82;font-size:12px;min-height:14px}
+
 </style></head>
 <body>
+
+<div id="kegate"><form id="kegateF" autocomplete="off">
+  <img src="logo.png" alt="">
+  <div class="keg-t">🔒 Private archive</div>
+  <div class="keg-s">Enter the password to continue.</div>
+  <input id="kegateP" type="password" placeholder="Password" autocomplete="off" autofocus>
+  <button type="submit">Enter</button>
+  <div id="kegateE"></div>
+</form></div>
+<script>
+(function(){
+  var PW="yippee", KEY='kea_unlocked', root=document.documentElement;
+  function unlock(){var g=document.getElementById('kegate');if(g&&g.parentNode)g.parentNode.removeChild(g);root.style.overflow='';}
+  if(localStorage.getItem(KEY)==='1'){unlock();return;}
+  root.style.overflow='hidden';
+  var f=document.getElementById('kegateF');
+  if(f)f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(document.getElementById('kegateP').value===PW){try{localStorage.setItem(KEY,'1');}catch(_){ } unlock();}
+    else{document.getElementById('kegateE').textContent='Wrong password. Try again.';document.getElementById('kegateP').select();}
+  });
+})();
+</script>
+
 <header>
   <h1>Kimera Chimera <span style="color:#6b7280;font-weight:400">· Chat Archive</span></h1>
   <div class="sub" id="subline"></div>
@@ -123,6 +160,12 @@ h1{margin:0;font-size:19px}
   var A=window.ARCHIVE||{streams:[],msgs:[],totals:{}};
   var S=A.streams, M=A.msgs, T=A.totals||{};
   var plat='all';   // 'all' | 'twitch' | 'youtube'
+  // Merge cross-platform name variants: @PoppaWhiskaz / poppa_whiskaz / Poppa_Whiskaz → poppawhiskaz
+  function norm(a){return (a||'').toLowerCase().replace(/^@+/,'').replace(/[^a-z0-9]/g,'');}
+  var NA=new Array(M.length), UCHAT=0;
+  (function(){var u={};for(var i=0;i<M.length;i++){var k=norm(M[i][3]);NA[i]=k;if(k)u[k]=1;}UCHAT=Object.keys(u).length;})();
+  var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function moLabel(mo){var p=(mo||'').split('.');if(p.length<2)return mo||'Undated';var m=parseInt(p[1],10);return (MONTHS[m-1]||mo)+' '+p[0];}
   function hms(s){s=Math.max(0,s|0);var h=(s/3600)|0,m=((s%3600)/60)|0,x=s%60;return h+':'+(m<10?'0':'')+m+':'+(x<10?'0':'')+x;}
   // Deep-link straight to the original VOD at this exact second (YouTube/Twitch).
   function deep(s,off){if(!s||!s.url)return '';var t=Math.max(0,off|0);return s.url+(s.url.indexOf('?')>=0?'&':'?')+'t='+t+'s';}
@@ -135,6 +178,7 @@ h1{margin:0;font-size:19px}
     +(A.range&&A.range.first?A.range.first+' → '+A.range.last:'')+'  •  generated '+(A.generated||'');
   document.getElementById('cards').innerHTML =
     '<div class="card"><div class="n">'+(T.messages||0).toLocaleString()+'</div><div class="l">Messages</div></div>'
+   +'<div class="card"><div class="n">'+UCHAT.toLocaleString()+'</div><div class="l">Chatters</div></div>'
    +'<div class="card"><div class="n">'+(T.streams||0)+'</div><div class="l">Streams</div></div>'
    +'<div class="card"><div class="n tw">'+(T.twitch||0).toLocaleString()+'</div><div class="l">Twitch</div></div>'
    +'<div class="card"><div class="n yt">'+(T.youtube||0).toLocaleString()+'</div><div class="l">YouTube</div></div>';
@@ -142,23 +186,26 @@ h1{margin:0;font-size:19px}
   // ── Top chatters (respects platform filter, shows TW/YT badges) ──
   var chBox=document.getElementById('chatters');
   function renderChatters(){
-    var counts={}, plats={};
+    var counts={}, plats={}, dispCnt={}, disp={};
     for(var i=0;i<M.length;i++){
       var m=M[i]; if(!inPlat(m))continue;
-      var a=m[3]; if(!a)continue;
-      counts[a]=(counts[a]||0)+1;
-      (plats[a]=plats[a]||{})[pOf(m)]=1;
+      var key=NA[i]; if(!key)continue;
+      counts[key]=(counts[key]||0)+1;
+      (plats[key]=plats[key]||{})[pOf(m)]=1;
+      var raw=m[3], dc=(dispCnt[key]=dispCnt[key]||{});
+      dc[raw]=(dc[raw]||0)+1;                       // pick the most-used spelling to display
+      if(!disp[key]||dc[raw]>dc[disp[key]])disp[key]=raw;
     }
     var top=Object.keys(counts).map(function(k){return [k,counts[k]];})
               .sort(function(a,b){return b[1]-a[1];}).slice(0,30);
     chBox.innerHTML = top.map(function(c){
-      var p=plats[c[0]]||{};
+      var key=c[0], p=plats[key]||{}, d=disp[key]||key;
       var b=(p.twitch?'<span class="cb tw">TW</span>':'')+(p.youtube?'<span class="cb yt">YT</span>':'');
-      return '<span class="chip" data-u="'+esc(c[0])+'" title="Search everything '+esc(c[0])+' said">'+b+esc(c[0])+'<b>'+c[1].toLocaleString()+'</b></span>';
+      return '<span class="chip" data-k="'+esc(key)+'" data-d="'+esc(d)+'" title="Everything '+esc(d)+' said (all name variants)">'+b+esc(d)+'<b>'+c[1].toLocaleString()+'</b></span>';
     }).join('') || '<div class="muted">No chatters for this platform.</div>';
   }
   chBox.addEventListener('click',function(e){
-    var c=e.target.closest('.chip'); if(!c)return; searchFor(c.dataset.u);
+    var c=e.target.closest('.chip'); if(!c)return; searchFor(c.dataset.k, c.dataset.d);
   });
 
   // ── Stream directory grouped by month — collapsed by default, filterable ──
@@ -183,7 +230,7 @@ h1{margin:0;font-size:19px}
           +'<span class="st">'+esc(s.title)+'</span>'
           +'<span class="sc">'+s.count.toLocaleString()+'</span></a>';
       }).join('');
-      return '<details class="month"'+(openAll?' open':'')+'><summary>'+esc(mo)+' · '+byMonth[mo].length+' streams</summary>'+rows+'</details>';
+      return '<details class="month"'+(openAll?' open':'')+'><summary>'+esc(moLabel(mo))+' · '+byMonth[mo].length+' streams</summary>'+rows+'</details>';
     }).join('') || '<div class="muted">No streams match.</div>';
     if(scount)scount.textContent='('+total+(f||(plat!=='all')?' of '+S.length:'')+')';
   }
@@ -198,16 +245,16 @@ h1{margin:0;font-size:19px}
   // ── Global search — name→search, message & timestamp→public VOD moment ──
   var qbox=document.getElementById('q'), rwrap=document.getElementById('resultsWrap'),
       rbox=document.getElementById('results'), rcount=document.getElementById('rcount'), tmr=null;
-  var CAP=400;
+  var CAP=400, authorKey=null;   // when set, search matches an exact (merged) chatter
   function runSearch(){
     var q=qbox.value.trim().toLowerCase();
-    if(q.length<2){rwrap.style.display='none';rbox.innerHTML='';return;}
+    if(!authorKey && q.length<2){rwrap.style.display='none';rbox.innerHTML='';return;}
     var hits=[],n=0;
     for(var i=0;i<M.length;i++){
       var m=M[i]; if(!inPlat(m))continue;
-      if((m[3]&&m[3].toLowerCase().indexOf(q)!==-1)||(m[4]&&m[4].toLowerCase().indexOf(q)!==-1)){
-        n++; if(hits.length<CAP) hits.push(m);
-      }
+      var ok = authorKey ? (NA[i]===authorKey)
+        : ((m[3]&&m[3].toLowerCase().indexOf(q)!==-1)||(m[4]&&m[4].toLowerCase().indexOf(q)!==-1));
+      if(ok){ n++; if(hits.length<CAP) hits.push(m); }
     }
     rwrap.style.display='block';
     rcount.textContent='('+n.toLocaleString()+(n>CAP?', showing first '+CAP:'')+')';
@@ -223,20 +270,20 @@ h1{margin:0;font-size:19px}
         : '<span class="rm">'+esc(m[4])+'</span>';
       return '<div class="res">'+ts
         +'<div class="rbody">'
-        +'<span class="ra" data-u="'+esc(m[3])+'" title="Search everything '+esc(m[3])+' said">'+esc(m[3])+'</span>'
+        +'<span class="ra" data-k="'+esc(norm(m[3]))+'" data-d="'+esc(m[3])+'" title="Everything '+esc(m[3])+' said (all name variants)">'+esc(m[3])+'</span>'
         +msg
         +'<span class="rs">'+esc(s.date)+' · '+esc(s.title)+'</span></div></div>';
     }).join('') || '<div class="muted">No matches.</div>';
   }
   rbox.addEventListener('click',function(e){
-    var a=e.target.closest('.ra'); if(!a)return; searchFor(a.dataset.u);
+    var a=e.target.closest('.ra'); if(!a)return; searchFor(a.dataset.k, a.dataset.d);
   });
-  function searchFor(name){
-    qbox.value=name; plat='all'; syncFilterButtons();
+  function searchFor(key, disp){
+    authorKey=key||null; qbox.value=disp||''; plat='all'; syncFilterButtons();
     renderChatters(); renderStreams(); runSearch();
     window.scrollTo({top:0,behavior:'smooth'});
   }
-  qbox.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(runSearch,160);});
+  qbox.addEventListener('input',function(){authorKey=null;clearTimeout(tmr);tmr=setTimeout(runSearch,160);});
   window.runSearch=runSearch;
 
   // ── Platform filter buttons (All / Twitch / YouTube) ──
